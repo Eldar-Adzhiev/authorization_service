@@ -20,7 +20,7 @@ type GRPCConfig struct {
 }
 
 func MustLoad() *Config {
-	path := fetchConfigPath()
+	path := "/Users/eldar/backend/authorization_service/config/local.yaml"
 	if path == "" {
 		panic("config file path is empty")
 	}
