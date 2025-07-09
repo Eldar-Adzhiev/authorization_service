@@ -7,6 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log/slog"
 	"sso/internal/domain/models"
+	"sso/internal/lib/jwt"
 	"sso/internal/lib/logger/sl"
 	"sso/internal/storage"
 	"time"
@@ -95,6 +96,17 @@ func (a *Auth) Login(
 		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
+	log.Info("User logged successfully")
+
+	token, err := jwt.NewToken(user, app, a.tokenTTL)
+
+	if err != nil {
+		a.log.Warn("Failed to create token", sl.Err(err))
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	return token, nil
+
 }
 
 // RegisterNewUser registers new user in the system and returns user ID.
@@ -129,5 +141,21 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string) (
 
 // IsAdmin checks if user is admin.
 func (a *Auth) IsAdmin(ctx context.Context, userID int64) (bool, error) {
-	panic("implement me")
+	const op = "Auth.IsAdmin"
+
+	log := a.log.With(
+		slog.String("op", op),
+		slog.Int64("user_id", userID),
+	)
+
+	log.Info("checking if user is admin")
+
+	isAdmin, err := a.usrProvider.IsAdmin(ctx, userID)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+
+	log.Info("checked if user is admin", slog.Bool("is_admin", isAdmin))
+
+	return isAdmin, nil
 }
