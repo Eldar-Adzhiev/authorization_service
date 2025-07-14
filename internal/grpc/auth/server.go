@@ -51,7 +51,7 @@ func (s *serverAPI) Login(
 
 	if err != nil {
 		if errors.Is(err, auth.ErrInvalidCredentials) {
-			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
+			return nil, status.Error(codes.InvalidArgument, "invalid email or password")
 		}
 		return nil, status.Error(codes.Internal, "Internal error")
 	}
@@ -102,13 +102,13 @@ func (s *serverAPI) IsAdmin(
 
 func validateLogin(req *ssov1.LoginRequest) error {
 	if req.GetEmail() == "" {
-		return status.Error(codes.InvalidArgument, "missing email")
+		return status.Error(codes.InvalidArgument, "email is required")
 	}
 	if req.GetPassword() == "" {
-		return status.Error(codes.InvalidArgument, "missing password")
+		return status.Error(codes.InvalidArgument, "password is required")
 	}
 	if req.GetAppId() == emptyValue {
-		return status.Error(codes.InvalidArgument, "missing app id")
+		return status.Error(codes.InvalidArgument, "app_id is required")
 	}
 
 	return nil
@@ -116,10 +116,10 @@ func validateLogin(req *ssov1.LoginRequest) error {
 
 func validateRegister(req *ssov1.RegisterRequest) error {
 	if req.GetEmail() == "" {
-		return status.Error(codes.InvalidArgument, "missing email")
+		return status.Error(codes.InvalidArgument, "email is required")
 	}
 	if req.GetPassword() == "" {
-		return status.Error(codes.InvalidArgument, "missing password")
+		return status.Error(codes.InvalidArgument, "password is required")
 	}
 
 	return nil
